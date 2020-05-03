@@ -7,7 +7,7 @@ import 'package:fluttericon/linearicons_free_icons.dart';
 import 'package:fluttericon/meteocons_icons.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart' show rootBundle;
-
+import 'package:gradient_app_bar/gradient_app_bar.dart';
 
 //Load json data
 Future<List<Weather>> fetchCities(apikey ,http.Client client) async {
@@ -75,7 +75,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   //Future for apikey load from secrets.json
-  Future<String> loadjson() async{
+  Future<String> loadjson() async{ 
    String jsondata = await rootBundle.loadString('secrets.json');
     setState(() {
       apikey = json.decode(jsondata)['api_key'];
@@ -85,17 +85,30 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Fetch Data Example',
+      title: 'Flutter Weather App',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
       home: Scaffold(
-        appBar: AppBar(
+        appBar: 
+        GradientAppBar(
           title: Text('Flutter Weather App'),
+          backgroundColorStart: Colors.cyan,
+          backgroundColorEnd: Colors.indigo,
         ),
-        body: FutureBuilder<List<Weather>>(            
+        body: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topRight,
+                end: Alignment.bottomLeft,
+                colors: [Colors.blue, Colors.purple]
+              )
+            ),
+            
+            child: FutureBuilder<List<Weather>>(   
+                    
             future: fetchCities(apikey,http.Client(),),
-            builder: (context, snapshot) {
+            builder: (context, snapshot) {              
               if (snapshot.hasData) {
                 return CityList(cities: snapshot.data);
               } else if (snapshot.hasError) {
@@ -105,6 +118,7 @@ class _MyAppState extends State<MyApp> {
               return Center(child:CircularProgressIndicator());
             },        
         ),
+      ),
       ),
     );
   }
@@ -127,71 +141,108 @@ class CityCard extends StatelessWidget{
   }
   @override 
   Widget build(BuildContext context){
-    return Card(
-      // Card weathercard(data){
-      // return Card (
-      child: Container(
-        padding: const EdgeInsets.all(25),  
-        //decoration: BoxDecoration(
-        color: Colors.blue.shade300,
-        //borderRadius: BorderRadius.circular(10)),        
-        child:Row (
-       // mainAxisSize: MainAxisSize.min,
-       //crossAxisAlignment: CrossAxisAlignment.end,
-      //  mainAxisAlignment: MainAxisAlignment.spaceEvenly,        
-        children: [
-          Column(
-           // mainAxisSize: MainAxisSize.min,
-            //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children:[
-              Text( "${data.town}, ${data.country}" , style: TextStyle(color: Colors.white, fontSize: 20)),
-              _getweathericon(data.wmain),
-              Text("${data.wmain}" , style: TextStyle(color: Colors.white, fontSize: 25) )
-            ],  
-          ),
-          Column(            
-          // mainAxisSize: MainAxisSize.min,
-          // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.end,
-            children:[           
-              Row(
-                children:[
-                  Icon(Meteocons.temperature, color: Colors.red, size: 30),
-                  Text( " ${data.temp} °C" , style: TextStyle(color: Colors.white, fontSize: 15)),
-                ]
-              ),
-              Row(
-                children:[
-                  Icon(Icons.accessibility_new, color: Colors.orange.shade100, size: 30),
-                  Text( " ${data.feel} °C" , style: TextStyle(color: Colors.white, fontSize: 15)),
-                ]
-              ),
-              //Text( "  ${data.wdesctiption}" , style: TextStyle(color: Colors.white, fontSize: 20)),         
+    return Container(
+      
+      //height: 124.0,
+      margin: new EdgeInsets.all(10.0),
+      padding: const EdgeInsets.all(15),  
+      decoration: new BoxDecoration(
+          color: new Color(0xFF333366),
+          shape: BoxShape.rectangle,
+          borderRadius: new BorderRadius.circular(8.0),
+          boxShadow: <BoxShadow>[
+              BoxShadow(  
+                color: Colors.black54,
+                blurRadius: 10.0,
+                offset: new Offset(0.0, 10.0),
+                ),
             ],
-          ),
-          Column(          
-         // mainAxisSize: MainAxisSize.min,
-        //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        //  crossAxisAlignment: CrossAxisAlignment.start,
-          children:[
-             Row(
-              children:[
-                Icon(LineariconsFree.drop, color: Colors.blue, size: 30),
-                Text( " ${data.humidity} %" , style: TextStyle(color: Colors.white, fontSize: 15)),
-              ],
-            ),
-            Row(             
-              children:[
-                Icon(Meteocons.wind, color: Colors.white , size: 30),
-                Text(" ${data.wind}" , style: TextStyle(color: Colors.white, fontSize: 15))
-              ]
-            )
-          ],
-        ),
-        ],        
-      ) ,
       ),
-    );
+      child: Row(
+        children: [
+          
+          Expanded(
+            
+            child:
+              Column(
+                children:[
+                  Text( "${data.town}, ${data.country}" , style: TextStyle(color: Colors.white, fontSize: 20)),
+                  SizedBox(height: 5),
+                  _getweathericon(data.wmain),
+                  SizedBox(height: 5),
+                  Text("${data.wmain}" , style: TextStyle(color: Colors.white, fontSize: 20) )
+                ], 
+              ),
+          ),
+          Container(
+            //color: Colors.black,
+            child:
+              Expanded(
+                 flex: 2,
+                  child: Column ( 
+                                  children:[ 
+                                              Text( "  ${data.wdesctiption[0].toUpperCase()}${data.wdesctiption.substring(1)}" , style: TextStyle(color: Colors.white, fontSize: 20)),
+                                              SizedBox(height: 10),
+                                              Row(
+                                                children: [
+                                                    Container(
+                                                     // color: Colors.yellow,
+                                                      child: Column(
+                                                        children:[
+                                                          Row(
+                                                            children:[
+                                                              Icon(Meteocons.temperature, color: Colors.red, size: 30),
+                                                              Text( " ${data.temp} °C" , style: TextStyle(color: Colors.white, fontSize: 15))
+                                                            ]
+                                                          ),
+                                                          SizedBox(height: 10),
+                                                          Row(
+                                                            children: [
+                                                              Icon(Icons.accessibility_new, color: Colors.orange.shade100, size: 30),
+                                                              Text( " ${data.feel} °C" , style: TextStyle(color: Colors.white, fontSize: 15))
+
+                                                            ]
+
+                                                          )
+                                                        ]
+                                                      ),
+                                                    ),
+                                                    SizedBox(width: 10),
+                                                    Container(
+                                                      //color: Colors.red,
+                                                      child: Column(
+                                                        children:[
+                                                          Row(
+                                                            children:[
+                                                              Icon(LineariconsFree.drop, color: Colors.blue, size: 30),
+                                                              Text( " ${data.humidity} %" , style: TextStyle(color: Colors.white, fontSize: 15)),
+                                                            ]
+                                                          ),
+                                                          SizedBox(height: 10),
+                                                          Row(
+                                                            children: [
+                                                              Icon(Meteocons.wind, color: Colors.white , size: 30),
+                                                              Text(" ${data.wind}" , style: TextStyle(color: Colors.white, fontSize: 15))
+
+                                                            ]
+
+                                                          )
+                                                        ]
+                                                      ),
+                                                    ),
+                                                  ],
+                                              ),
+                                  ],
+
+                                              ),
+              ),
+                               
+                                              ), 
+        ],
+              ),
+          );
+ 
+         
   }
 }
 
